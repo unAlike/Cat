@@ -1,23 +1,25 @@
 {
-  "name": "vite-react-typescript-starter",
-  "version": "0.0.0",
-  "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview"
-  },
+  "name": "purrfect-encyclopedia",
+  "version": "1.0.0",
+  "private": true,
   "dependencies": {
-    "@inlet/react-pixi": "^6.6.5",
-    "pixi.js": "^6.2.1",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
-    "reset.css": "^2.0.2"
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
-    "@types/react": "^17.0.33",
-    "@types/react-dom": "^17.0.10",
-    "@vitejs/plugin-react": "^1.0.7",
-    "typescript": "^4.5.4",
-    "vite": "^2.7.2"
+    "@vitejs/plugin-react": "^4.0.0",
+    "vite": "^4.4.0"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "eslintConfig": {
+    "rules": {
+      "no-unused-vars": "off",
+      "react/prop-types": "off",
+      "react/display-name": "off"
+    }
   }
 }
