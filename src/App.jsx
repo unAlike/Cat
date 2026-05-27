@@ -15,8 +15,8 @@ async function fetchWikiImage(title) {
 
   const isCatArticle = (data) => {
     if (!data) return false;
-    const text = `${data.description || ""} ${data.extract || ""}`.toLowerCase();
-    return text.includes("cat") || text.includes("feline") || text.includes("felid");
+    const desc = (data.description || "").toLowerCase();
+    return desc.includes("cat") || desc.includes("feline") || desc.includes("felid");
   };
 
   const imgSrc = (data) => data?.thumbnail?.source || data?.original?.source || "";
