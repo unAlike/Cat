@@ -2,19 +2,26 @@ import { useState, useEffect } from "react";
 
 const wikiImageCache = new Map();
 
+function getFallbackCatImage(title) {
+  const normalized = title.replace(/[^a-zA-Z0-9]+/g, ",").replace(/(^,+|,+$)/g, "").toLowerCase();
+  return `https://loremflickr.com/400/210/cat,${encodeURIComponent(normalized)}?lock=${encodeURIComponent(title)}`;
+}
+
 async function fetchWikiImage(title) {
   if (wikiImageCache.has(title)) return wikiImageCache.get(title);
+  let src = "";
   try {
     const res = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title)}`);
-    if (!res.ok) throw new Error("wiki summary not available");
-    const data = await res.json();
-    const src = data?.thumbnail?.source || data?.original?.source || "";
-    if (src) wikiImageCache.set(title, src);
-    return src;
+    if (res.ok) {
+      const data = await res.json();
+      src = data?.thumbnail?.source || data?.original?.source || "";
+    }
   } catch {
-    wikiImageCache.set(title, "");
-    return "";
+    src = "";
   }
+  if (!src) src = getFallbackCatImage(title);
+  wikiImageCache.set(title, src);
+  return src;
 }
 
 // Color palettes per species type for illustrated cards
