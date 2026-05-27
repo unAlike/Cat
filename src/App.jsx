@@ -2,10 +2,6 @@ import { useState, useEffect } from "react";
 
 const wikiImageCache = new Map();
 
-function getFallbackCatImage(title) {
-  return `https://cataas.com/cat?width=400&height=210&cache-bust=${encodeURIComponent(title)}`;
-}
-
 async function fetchWikiImage(title) {
   if (wikiImageCache.has(title)) return wikiImageCache.get(title);
   let src = "";
@@ -18,7 +14,6 @@ async function fetchWikiImage(title) {
   } catch {
     src = "";
   }
-  if (!src) src = getFallbackCatImage(title);
   wikiImageCache.set(title, src);
   return src;
 }
