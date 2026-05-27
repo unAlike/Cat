@@ -1,4 +1,21 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+
+const wikiImageCache = new Map();
+
+async function fetchWikiImage(title) {
+  if (wikiImageCache.has(title)) return wikiImageCache.get(title);
+  try {
+    const res = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title)}`);
+    if (!res.ok) throw new Error("wiki summary not available");
+    const data = await res.json();
+    const src = data?.thumbnail?.source || data?.original?.source || "";
+    if (src) wikiImageCache.set(title, src);
+    return src;
+  } catch {
+    wikiImageCache.set(title, "");
+    return "";
+  }
+}
 
 // Color palettes per species type for illustrated cards
 const CATS = [
@@ -251,6 +268,24 @@ const selStyle = { padding:"9px 30px 9px 12px",border:"1.5px solid rgba(42,31,26
 
 function CatCard({ cat, idx }) {
   const badge = BADGE[cat.species];
+  const wikiTitle = cat.wikiTitle || cat.name;
+  const [imgSrc, setImgSrc] = useState(() => wikiImageCache.get(wikiTitle) || "");
+
+  useEffect(() => {
+    let active = true;
+    if (!imgSrc) {
+      const cached = wikiImageCache.get(wikiTitle);
+      if (cached) {
+        setImgSrc(cached);
+      } else {
+        fetchWikiImage(wikiTitle).then(src => {
+          if (active && src) setImgSrc(src);
+        });
+      }
+    }
+    return () => { active = false; };
+  }, [imgSrc, wikiTitle]);
+
   return (
     <div
       style={{ background:"#fffaf4",borderRadius:18,border:"1px solid rgba(42,31,26,0.11)",overflow:"hidden",display:"flex",flexDirection:"column",animation:`fadeUp .4s ease ${Math.min(idx*.025,.5)}s both`,transition:"transform .25s,box-shadow .25s" }}
@@ -258,7 +293,15 @@ function CatCard({ cat, idx }) {
       onMouseLeave={e=>{e.currentTarget.style.transform="";e.currentTarget.style.boxShadow="";}}
     >
       <div style={{ height:210,position:"relative",overflow:"hidden",flexShrink:0 }}>
-        <CatIllustration cat={cat}/>
+        {imgSrc ? (
+          <img
+            src={imgSrc}
+            alt={`${cat.name} from Wikipedia`}
+            style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }}
+          />
+        ) : (
+          <CatIllustration cat={cat}/>
+        )}
         <div style={{ position:"absolute",top:10,left:10,background:badge.bg,color:badge.color,fontSize:10,fontWeight:700,letterSpacing:1.3,textTransform:"uppercase",padding:"3px 10px",borderRadius:100 }}>{cat.species}</div>
       </div>
       <div style={{ padding:"15px 18px 10px" }}>
