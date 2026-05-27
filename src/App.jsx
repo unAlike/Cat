@@ -8,16 +8,25 @@ async function fetchWikiImage(title) {
   const tryFetch = async (t) => {
     try {
       const res = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(t)}`);
-      if (res.ok) {
-        const data = await res.json();
-        return data?.thumbnail?.source || data?.original?.source || "";
-      }
+      if (res.ok) return await res.json();
     } catch {}
-    return "";
+    return null;
   };
 
-  let src = await tryFetch(title);
-  if (!src) src = await tryFetch(`${title} cat`);
+  const isCatArticle = (data) => {
+    if (!data) return false;
+    const text = `${data.description || ""} ${data.extract || ""}`.toLowerCase();
+    return text.includes("cat") || text.includes("feline") || text.includes("felid");
+  };
+
+  const imgSrc = (data) => data?.thumbnail?.source || data?.original?.source || "";
+
+  const data1 = await tryFetch(title);
+  let src = (isCatArticle(data1) && imgSrc(data1)) ? imgSrc(data1) : "";
+  if (!src) {
+    const data2 = await tryFetch(`${title} cat`);
+    src = imgSrc(data2);
+  }
 
   wikiImageCache.set(title, src);
   return src;
