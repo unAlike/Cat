@@ -3,8 +3,7 @@ import { useState, useEffect } from "react";
 const wikiImageCache = new Map();
 
 function getFallbackCatImage(title) {
-  const normalized = title.replace(/[^a-zA-Z0-9]+/g, ",").replace(/(^,+|,+$)/g, "").toLowerCase();
-  return `https://loremflickr.com/400/210/cat,${encodeURIComponent(normalized)}?lock=${encodeURIComponent(title)}`;
+  return `https://cataas.com/cat?width=400&height=210&cache-bust=${encodeURIComponent(title)}`;
 }
 
 async function fetchWikiImage(title) {
@@ -303,7 +302,7 @@ function CatCard({ cat, idx }) {
         {imgSrc ? (
           <img
             src={imgSrc}
-            alt={`${cat.name} from Wikipedia`}
+            alt={`${cat.name} cat image`}
             style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }}
           />
         ) : (
