@@ -4,16 +4,21 @@ const wikiImageCache = new Map();
 
 async function fetchWikiImage(title) {
   if (wikiImageCache.has(title)) return wikiImageCache.get(title);
-  let src = "";
-  try {
-    const res = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title)}`);
-    if (res.ok) {
-      const data = await res.json();
-      src = data?.thumbnail?.source || data?.original?.source || "";
-    }
-  } catch {
-    src = "";
-  }
+
+  const tryFetch = async (t) => {
+    try {
+      const res = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(t)}`);
+      if (res.ok) {
+        const data = await res.json();
+        return data?.thumbnail?.source || data?.original?.source || "";
+      }
+    } catch {}
+    return "";
+  };
+
+  let src = await tryFetch(title);
+  if (!src) src = await tryFetch(`${title} cat`);
+
   wikiImageCache.set(title, src);
   return src;
 }
