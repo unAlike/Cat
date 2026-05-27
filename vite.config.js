@@ -6,6 +6,7 @@ export default defineConfig({
   build: {
     rollupOptions: {
       onwarn(warning, warn) {
+        // Suppress all warnings during build
         if (warning.code === 'MODULE_LEVEL_EXPORT_NOT_FOUND') return
         if (warning.code === 'UNUSED_EXTERNAL_IMPORT') return
         warn(warning)
